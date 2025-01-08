@@ -12,8 +12,8 @@ interface Thread {
 }
 
 const App: React.FC = () => {
-  const [userId, setUserId] = useState<number | null>(
-    () => Number(localStorage.getItem("userId")) || null
+  const [userId, setUserId] = useState<number>(
+    () => Number(localStorage.getItem("userId")) || 0
   );
   const [threads, setThreads] = useState<Thread[]>([]);
 
@@ -36,7 +36,7 @@ const App: React.FC = () => {
 
   // Handle logout
   const handleLogout = () => {
-    setUserId(null); // Clear user ID
+    setUserId(0); // Clear user ID
     localStorage.removeItem("userId"); // Remove from storage
   };
 
@@ -46,27 +46,29 @@ const App: React.FC = () => {
 
   return (
     <div>
-      {userId ? (
-        <div>
-          <h1>Welcome, User {userId}</h1>
-          <button onClick={handleLogout}>Logout</button>
+      <div>
+        {userId ? (
           <div>
-            <AddPost userId={userId} onPostAdded={fetchThreads} />
-            {threads.map((thread) => (
-              <Post
-                key={thread.id}
-                id={thread.id}
-                title={thread.title}
-                content={thread.content}
-                userId={thread.userId}
-                currentUser={userId}
-              />
-            ))}
+            <h1>Welcome, User {userId}</h1>
+            <button onClick={handleLogout}>Logout</button>
           </div>
-        </div>
-      ) : (
-        <Login onLogin={handleLogin} />
-      )}
+        ) : (
+          <Login onLogin={handleLogin} />
+        )}
+      </div>
+      <div>
+        <AddPost userId={userId} onPostAdded={fetchThreads} />
+        {threads.map((thread) => (
+          <Post
+            key={thread.id}
+            id={thread.id}
+            title={thread.title}
+            content={thread.content}
+            userId={thread.userId}
+            currentUser={userId}
+          />
+        ))}
+      </div>
     </div>
   );
 };

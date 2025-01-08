@@ -117,5 +117,43 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"message": "Thread updated successfully"})
 	})
 
+	r.GET("/threads/:id/comments", func(c *gin.Context) {
+		id := c.Param("id")
+		rows, err := database.DB.Query("SELECT id, content, user_id FROM comments WHERE thread_id = ?", id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch comments"})
+			return
+		}
+		defer rows.Close()
+
+		var comments []map[string]interface{}
+		for rows.Next() {
+			var id, user_id int
+			var content string
+			rows.Scan(&id, &content, &user_id)
+			comments = append(comments, gin.H{"id": id, "content": content, "userId": user_id})
+		}
+		c.JSON(http.StatusOK, comments)
+	})
+
+	r.POST("/threads/:id/comments", func(c *gin.Context) {
+		threadID := c.Param("id")
+		var comment struct {
+			Content string `json:"content"`
+			UserID  int    `json:"userId"`
+		}
+		if err := c.ShouldBindJSON(&comment); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+			return
+		}
+		_, err := database.DB.Exec("INSERT INTO comments (content, user_id, thread_id) VALUES (?, ?, ?)",
+			comment.Content, comment.UserID, threadID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add comment"})
+			return
+		}
+		c.JSON(http.StatusCreated, gin.H{"message": "Comment added"})
+	})
+
 	r.Run(":8080")
 }
