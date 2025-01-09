@@ -1,7 +1,10 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
+import Comment from "./Comment";
+import { IconButton, Button, TextField } from "@mui/material";
+import { MoreVert } from "@mui/icons-material";
 
-interface Comment {
+interface CommentData {
   id: number;
   content: string;
   userId: number;
@@ -10,20 +13,28 @@ interface Comment {
 
 interface PostProps {
   id: number;
-  title: string;
-  content: string;
+  oldTitle: string;
+  oldContent: string;
   userId: number;
   currentUser: number;
+  onDelete: () => void;
 }
 
-const Post = ({ id, title, content, userId, currentUser }: PostProps) => {
-  // State variables
-  const [newTitle, setTitle] = useState(title);
-  const [newContent, setContent] = useState(content);
+const Post = ({
+  id,
+  oldTitle,
+  oldContent,
+  userId,
+  currentUser,
+  onDelete,
+}: PostProps) => {
+  const [newTitle, setTitle] = useState(oldTitle);
+  const [newContent, setContent] = useState(oldContent);
   const [editMode, setEditMode] = useState(false);
-  const [expanded, setExpanded] = useState(false); // Controls expand/collapse
-  const [comments, setComments] = useState<Comment[]>([]); // Stores comments
-  const [newComment, setNewComment] = useState(""); // New comment input
+  const [expanded, setExpanded] = useState(false);
+  const [comments, setComments] = useState<CommentData[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [menuExpanded, setMenu] = useState(false);
 
   // Fetch comments when expanded
   useEffect(() => {
@@ -32,15 +43,32 @@ const Post = ({ id, title, content, userId, currentUser }: PostProps) => {
     }
   }, [expanded]);
 
-  // Fetch comments from the server
+  // Fetch comments
   const fetchComments = async () => {
     try {
       const response = await axios.get(
         `http://localhost:8080/threads/${id}/comments`
       );
-      setComments(response.data);
+      setComments(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Failed to fetch comments:", error);
+    }
+  };
+
+  // Handle adding a new comment
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+
+    try {
+      await axios.post(`http://localhost:8080/threads/${id}/comments`, {
+        content: newComment,
+        userId: currentUser,
+      });
+
+      fetchComments();
+      setNewComment("");
+    } catch (error) {
+      console.error("Failed to add comment:", error);
     }
   };
 
@@ -53,29 +81,41 @@ const Post = ({ id, title, content, userId, currentUser }: PostProps) => {
         userId,
       });
       setEditMode(false);
+      fetchComments();
     } catch (error) {
       console.error("Failed to update post:", error);
     }
   };
 
-  // Handle adding a comment
-  const handleAddComment = async () => {
-    if (!newComment.trim()) return; // Prevent empty comments
-
+  // Handle deleting the post
+  const handleDelete = async () => {
     try {
-      const response = await axios.post(
-        `http://localhost:8080/threads/${id}/comments`,
-        {
-          content: newComment,
-          userId: currentUser,
-        }
-      );
-
-      setComments([...comments, response.data]); // Update comments list
-      setNewComment(""); // Clear input field
+      await axios.delete(`http://localhost:8080/threads/${id}`);
+      onDelete(); // Remove post
     } catch (error) {
-      console.error("Failed to add comment:", error);
+      console.error("Failed to delete post:", error);
     }
+  };
+
+  // Handle comment update
+  const handleUpdateComment = (commentId: number, updatedContent: string) => {
+    setComments(
+      comments.map((comment) =>
+        comment.id === commentId
+          ? { ...comment, content: updatedContent }
+          : comment
+      )
+    );
+  };
+
+  // Handle comment delete
+  const handleDeleteComment = (commentId: number) => {
+    setComments(comments.filter((comment) => comment.id !== commentId));
+  };
+
+  //Expand edit menu
+  const toggleMenu = () => {
+    setMenu(!menuExpanded);
   };
 
   return (
@@ -87,45 +127,56 @@ const Post = ({ id, title, content, userId, currentUser }: PostProps) => {
             value={newContent}
             onChange={(e) => setContent(e.target.value)}
           />
-          <button onClick={handleUpdate}>Save</button>
+          <Button onClick={handleUpdate}>Save</Button>
         </>
       ) : (
         <>
           <h2>{newTitle}</h2>
           <p>{newContent}</p>
           {userId === currentUser && (
-            <button onClick={() => setEditMode(true)}>Edit</button>
+            <>
+              <IconButton onClick={toggleMenu}>
+                <MoreVert />
+              </IconButton>
+              {menuExpanded && (
+                <>
+                  <button onClick={() => setEditMode(true)}>Edit</button>
+                  <button onClick={handleDelete}>Delete</button>
+                </>
+              )}
+            </>
           )}
         </>
       )}
 
-      {/* Expand/Collapse Comments Section */}
-      <button onClick={() => setExpanded(!expanded)}>
+      <Button onClick={() => setExpanded(!expanded)}>
         {expanded ? "Hide Comments" : "Show Comments"}
-      </button>
+      </Button>
 
       {expanded && (
         <div className="comments-section">
           <h3>Comments</h3>
-          <ul>
-            {comments.map((comment) => (
-              <li key={comment.id}>
-                <p>
-                  {comment.content} <small>by User {comment.userId}</small>
-                </p>
-              </li>
+          {comments &&
+            comments.map((comment) => (
+              <Comment
+                key={comment.id}
+                id={comment.id}
+                content={comment.content}
+                userId={comment.userId}
+                currentUser={currentUser}
+                onDelete={handleDeleteComment}
+                onUpdate={handleUpdateComment}
+              />
             ))}
-          </ul>
 
-          {/* Add New Comment */}
-          <div className="add-comment">
-            <textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Write a comment..."
-            />
-            <button onClick={handleAddComment}>Add Comment</button>
-          </div>
+          <TextField
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Write a comment..."
+          />
+          <Button onClick={handleAddComment} variant="outlined">
+            Add Comment
+          </Button>
         </div>
       )}
     </div>
