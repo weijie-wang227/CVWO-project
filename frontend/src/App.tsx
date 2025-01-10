@@ -4,6 +4,7 @@ import Post from "./components/Post"; // Post component
 import AddPost from "./components/AddPost";
 import Login from "./components/Login"; // Login component
 import Sidebar from "./components/SideBar"; //Sidebar component
+import { Divider, Typography, Button } from "@mui/material";
 
 interface Thread {
   id: number;
@@ -68,27 +69,30 @@ const App: React.FC = () => {
       <div>
         {userId ? (
           <div>
-            <h1>Welcome, User {userId}</h1>
-            <button onClick={handleLogout}>Logout</button>
+            <Typography variant="h3">Welcome, User {userId}</Typography>
+            <Button onClick={handleLogout}>Logout</Button>
           </div>
         ) : (
           <Login onLogin={handleLogin} />
         )}
       </div>
       <Sidebar onCategorySelect={setSelectedCategories} />
-      <div>
+      <div key={"AddPost"}>
         {userId > 0 && <AddPost userId={userId} onPostAdded={fetchThreads} />}
         {threads &&
           filteredThreads.map((thread) => (
-            <Post
-              key={thread.id}
-              id={thread.id}
-              oldTitle={thread.title}
-              oldContent={thread.content}
-              userId={thread.userId}
-              currentUser={userId}
-              onDelete={fetchThreads}
-            />
+            <>
+              <Post
+                key={"post" + thread.id}
+                id={thread.id}
+                oldTitle={thread.title}
+                oldContent={thread.content}
+                userId={thread.userId}
+                currentUser={userId}
+                onDelete={fetchThreads}
+              />
+              <Divider />
+            </>
           ))}
       </div>
     </div>

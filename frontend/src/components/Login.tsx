@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
+import { Button } from "@mui/material";
 
 const Login = ({ onLogin }: { onLogin: (id: number) => void }) => {
   const [username, setUsername] = useState("");
@@ -23,7 +24,7 @@ const Login = ({ onLogin }: { onLogin: (id: number) => void }) => {
         value={username}
         onChange={(e) => setUsername(e.target.value)}
       />
-      <button onClick={handleLogin}>Login</button>
+      <Button onClick={handleLogin}>Login</Button>
     </div>
   );
 };

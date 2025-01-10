@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"forum-app/database"
 	"net/http"
 	"strconv"
@@ -136,11 +137,7 @@ func main() {
 	// Edit a Thread
 	r.PUT("/threads/:id", func(c *gin.Context) {
 		id := c.Param("id")
-		var thread struct {
-			Title   string `json:"newTitle"`
-			Content string `json:"newContent"`
-			UserID  int    `json:"userId"`
-		}
+		var thread Thread
 		if err := c.BindJSON(&thread); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 			return
@@ -221,6 +218,33 @@ func main() {
 		}
 	})
 
+	r.PUT("comments/:id", func(c *gin.Context) {
+		commentID := c.Param("id")
+		var comment Comment
+		if err := c.BindJSON(&comment); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+			return
+		}
+
+		// Check if user owns the thread
+		var dbUserID int
+		err := database.DB.QueryRow("SELECT user_id FROM comments WHERE id = ?", commentID).Scan(&dbUserID)
+		if err != nil || dbUserID != comment.UserID {
+			fmt.Println(comment.UserID)
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			return
+		}
+
+		_, err = database.DB.Exec("UPDATE comments SET content = ? WHERE id = ?", comment.Content, commentID)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update comment"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "Comment updated successfully"})
+	})
+
+	//Get all categories
 	r.GET("/categories", func(c *gin.Context) {
 		rows, err := database.DB.Query("SELECT id, name FROM categories")
 		if err != nil {

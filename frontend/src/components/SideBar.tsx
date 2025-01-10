@@ -44,12 +44,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onCategorySelect }) => {
   return (
     <>
       <Button onClick={toggleDrawer(true)}>Choose Categories</Button>
-      <Drawer open={open} onClose={toggleDrawer(false)}>
+      <Drawer anchor="left" open={open} onClose={toggleDrawer(false)}>
         <Box sx={{ width: 250 }} role="presentation">
           <h3>Categories</h3>
           <ul>
             {categories.map((category) => (
-              <li key={category.id}>
+              <li key={"category" + category.id}>
                 <label>
                   <input
                     type="checkbox"

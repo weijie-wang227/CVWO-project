@@ -1,5 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
+import EditMenu from "./EditMenu";
+import { TextField, Button, Typography } from "@mui/material";
 
 interface CommentProps {
   id: number;
@@ -26,6 +28,7 @@ const Comment = ({
     try {
       await axios.put(`http://localhost:8080/comments/${id}`, {
         content: newContent,
+        userId: currentUser,
       });
       onUpdate(id, newContent); // Update locally
       setEditMode(false); // Exit edit mode
@@ -48,21 +51,18 @@ const Comment = ({
     <div className="comment">
       {editMode ? (
         <>
-          <textarea
+          <TextField
             value={newContent}
             onChange={(e) => setNewContent(e.target.value)}
           />
-          <button onClick={handleUpdate}>Save</button>
-          <button onClick={() => setEditMode(false)}>Cancel</button>
+          <Button onClick={handleUpdate}>Save</Button>
+          <Button onClick={() => setEditMode(false)}>Cancel</Button>
         </>
       ) : (
         <>
-          <p>{content}</p>
+          <Typography>{content}</Typography>
           {userId === currentUser && (
-            <>
-              <button onClick={() => setEditMode(true)}>Edit</button>
-              <button onClick={handleDelete}>Delete</button>
-            </>
+            <EditMenu handleDelete={handleDelete} setEditMode={setEditMode} />
           )}
         </>
       )}

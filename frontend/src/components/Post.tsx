@@ -1,8 +1,8 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import Comment from "./Comment";
-import { IconButton, Button, TextField } from "@mui/material";
-import { MoreVert } from "@mui/icons-material";
+import EditMenu from "./EditMenu.tsx";
+import { Button, TextField } from "@mui/material";
 
 interface CommentData {
   id: number;
@@ -34,7 +34,6 @@ const Post = ({
   const [expanded, setExpanded] = useState(false);
   const [comments, setComments] = useState<CommentData[]>([]);
   const [newComment, setNewComment] = useState("");
-  const [menuExpanded, setMenu] = useState(false);
 
   // Fetch comments when expanded
   useEffect(() => {
@@ -113,17 +112,15 @@ const Post = ({
     setComments(comments.filter((comment) => comment.id !== commentId));
   };
 
-  //Expand edit menu
-  const toggleMenu = () => {
-    setMenu(!menuExpanded);
-  };
-
   return (
     <div className="post">
       {editMode ? (
         <>
-          <input value={newTitle} onChange={(e) => setTitle(e.target.value)} />
-          <textarea
+          <TextField
+            value={newTitle}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <TextField
             value={newContent}
             onChange={(e) => setContent(e.target.value)}
           />
@@ -134,17 +131,11 @@ const Post = ({
           <h2>{newTitle}</h2>
           <p>{newContent}</p>
           {userId === currentUser && (
-            <>
-              <IconButton onClick={toggleMenu}>
-                <MoreVert />
-              </IconButton>
-              {menuExpanded && (
-                <>
-                  <button onClick={() => setEditMode(true)}>Edit</button>
-                  <button onClick={handleDelete}>Delete</button>
-                </>
-              )}
-            </>
+            <EditMenu
+              key={"PostMenu" + id}
+              handleDelete={handleDelete}
+              setEditMode={setEditMode}
+            />
           )}
         </>
       )}
@@ -159,7 +150,7 @@ const Post = ({
           {comments &&
             comments.map((comment) => (
               <Comment
-                key={comment.id}
+                key={"comment" + comment.id}
                 id={comment.id}
                 content={comment.content}
                 userId={comment.userId}

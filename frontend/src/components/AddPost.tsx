@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { TextField, Button } from "@mui/material/";
+import { TextField, Button, Box } from "@mui/material/";
 
 interface Category {
   id: number;
@@ -17,7 +17,8 @@ const AddPost = ({ userId, onPostAdded }: AddPostProps) => {
   const [content, setContent] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-  const [filled, setFill] = useState(true);
+  const [titleFilled, setTitleFill] = useState(false);
+  const [contentFilled, setContentFill] = useState(false);
 
   // Fetch categories when the component loads
   useEffect(() => {
@@ -44,8 +45,13 @@ const AddPost = ({ userId, onPostAdded }: AddPostProps) => {
   };
 
   const handleAddPost = async () => {
-    if (title === "" || content === "") {
-      setFill(false);
+    if (title == "") {
+      setTitleFill(true);
+      setContentFill(false);
+      return;
+    } else if (content == "") {
+      setTitleFill(false);
+      setContentFill(true);
       return;
     }
     try {
@@ -65,10 +71,12 @@ const AddPost = ({ userId, onPostAdded }: AddPostProps) => {
   };
 
   return (
-    <div>
+    <Box>
       <h3>Add New Post</h3>
       <div>
         <TextField
+          error={titleFilled}
+          label={titleFilled ? "Don't leave empty" : undefined}
           variant="outlined"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -76,11 +84,14 @@ const AddPost = ({ userId, onPostAdded }: AddPostProps) => {
         />
       </div>
       <TextField
+        error={contentFilled}
+        label={contentFilled ? "Don't leave empty" : undefined}
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="Content"
+        multiline
+        maxRows={4}
       />
-      {!filled && <div>Title and Content field cannot be empty</div>}
 
       <h4>Select Categories:</h4>
       <div>
@@ -98,7 +109,7 @@ const AddPost = ({ userId, onPostAdded }: AddPostProps) => {
       </div>
 
       <Button onClick={handleAddPost}>Add Post</Button>
-    </div>
+    </Box>
   );
 };
 
