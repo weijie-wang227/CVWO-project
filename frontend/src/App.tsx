@@ -55,7 +55,10 @@ const App: React.FC = () => {
     <Box sx={{ display: "flex" }}>
       <Login setUserId={setUserId} userId={userId} />
 
-      <Sidebar onCategorySelect={setSelectedCategories} />
+      <Sidebar
+        text={"Filter by Categories"}
+        onCategorySelect={setSelectedCategories}
+      />
       <Box
         component="main"
         sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}

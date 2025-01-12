@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Drawer, Box } from "@mui/material";
+import {
+  Drawer,
+  Box,
+  Typography,
+  Toolbar,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+} from "@mui/material";
 
 interface Category {
   id: number;
@@ -8,10 +16,11 @@ interface Category {
 }
 
 interface SidebarProps {
+  text: string;
   onCategorySelect: (selectedCategories: number[]) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onCategorySelect }) => {
+const Sidebar: React.FC<SidebarProps> = ({ text, onCategorySelect }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
 
@@ -52,21 +61,17 @@ const Sidebar: React.FC<SidebarProps> = ({ onCategorySelect }) => {
         anchor="left"
       >
         <Box sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}>
-          <h3>Categories</h3>
-          <ul>
+          <Toolbar />
+          <Typography variant="h6">{text}</Typography>
+          <FormGroup>
             {categories.map((category) => (
-              <li key={category.id}>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={selectedCategories.includes(category.id)}
-                    onChange={() => handleCategoryToggle(category.id)}
-                  />
-                  {category.name}
-                </label>
-              </li>
+              <FormControlLabel
+                onChange={() => handleCategoryToggle(category.id)}
+                control={<Checkbox />}
+                label={category.name}
+              />
             ))}
-          </ul>
+          </FormGroup>
         </Box>
       </Drawer>
     </>
