@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Drawer, Button, Box } from "@mui/material";
+import { Drawer, Box } from "@mui/material";
 
 interface Category {
   id: number;
@@ -14,7 +14,6 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ onCategorySelect }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-  const [open, setOpen] = React.useState(false);
 
   useEffect(() => {
     // Fetch categories from the backend
@@ -37,19 +36,26 @@ const Sidebar: React.FC<SidebarProps> = ({ onCategorySelect }) => {
     onCategorySelect(updatedSelection); // Notify parent component
   };
 
-  const toggleDrawer = (newOpen: boolean) => () => {
-    setOpen(newOpen);
-  };
-
   return (
     <>
-      <Button onClick={toggleDrawer(true)}>Choose Categories</Button>
-      <Drawer anchor="left" open={open} onClose={toggleDrawer(false)}>
-        <Box sx={{ width: 250 }} role="presentation">
+      <Drawer
+        sx={{
+          width: 240,
+          flexShrink: 0,
+          "& .MuiDrawer-paper": {
+            width: 240,
+            boxSizing: "border-box",
+          },
+          zIndex: (theme) => theme.zIndex.appBar - 1,
+        }}
+        variant="permanent"
+        anchor="left"
+      >
+        <Box sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}>
           <h3>Categories</h3>
           <ul>
             {categories.map((category) => (
-              <li key={"category" + category.id}>
+              <li key={category.id}>
                 <label>
                   <input
                     type="checkbox"

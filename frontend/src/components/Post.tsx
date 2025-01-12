@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import Comment from "./Comment";
 import EditMenu from "./EditMenu.tsx";
-import { Button, TextField } from "@mui/material";
+import { Box, Button, TextField, Typography, Stack, Chip } from "@mui/material";
 
 interface CommentData {
   id: number;
@@ -34,6 +34,7 @@ const Post = ({
   const [expanded, setExpanded] = useState(false);
   const [comments, setComments] = useState<CommentData[]>([]);
   const [newComment, setNewComment] = useState("");
+  const [categories, setCategories] = useState<string[]>([]);
 
   // Fetch comments when expanded
   useEffect(() => {
@@ -41,6 +42,10 @@ const Post = ({
       fetchComments();
     }
   }, [expanded]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   // Fetch comments
   const fetchComments = async () => {
@@ -51,6 +56,17 @@ const Post = ({
       setComments(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Failed to fetch comments:", error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/threads/${id}/categories`
+      );
+      setCategories(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
     }
   };
 
@@ -113,7 +129,7 @@ const Post = ({
   };
 
   return (
-    <div className="post">
+    <Box>
       {editMode ? (
         <>
           <TextField
@@ -127,17 +143,25 @@ const Post = ({
           <Button onClick={handleUpdate}>Save</Button>
         </>
       ) : (
-        <>
-          <h2>{newTitle}</h2>
-          <p>{newContent}</p>
-          {userId === currentUser && (
-            <EditMenu
-              key={"PostMenu" + id}
-              handleDelete={handleDelete}
-              setEditMode={setEditMode}
-            />
-          )}
-        </>
+        <Box>
+          <Box display="flex" sx={{ height: "40px", p: "2px" }}>
+            <Typography variant="h5">{newTitle}</Typography>
+            <Stack direction="row" spacing={0.5} sx={{ pl: "20px" }}>
+              {categories &&
+                categories.map((category) => (
+                  <Chip label={category} key={category} />
+                ))}
+            </Stack>
+            {userId === currentUser && (
+              <EditMenu
+                key={"PostMenu" + id}
+                handleDelete={handleDelete}
+                setEditMode={setEditMode}
+              />
+            )}
+          </Box>
+          <Typography>{newContent}</Typography>
+        </Box>
       )}
 
       <Button onClick={() => setExpanded(!expanded)}>
@@ -147,6 +171,18 @@ const Post = ({
       {expanded && (
         <div className="comments-section">
           <h3>Comments</h3>
+          {currentUser != 0 && (
+            <>
+              <TextField
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Write a comment..."
+              />
+              <Button onClick={handleAddComment} variant="outlined">
+                Add Comment
+              </Button>
+            </>
+          )}
           {comments &&
             comments.map((comment) => (
               <Comment
@@ -159,18 +195,9 @@ const Post = ({
                 onUpdate={handleUpdateComment}
               />
             ))}
-
-          <TextField
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Write a comment..."
-          />
-          <Button onClick={handleAddComment} variant="outlined">
-            Add Comment
-          </Button>
         </div>
       )}
-    </div>
+    </Box>
   );
 };
 

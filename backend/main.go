@@ -172,7 +172,7 @@ func main() {
 		}
 	})
 
-	//Get All Comments
+	//Get All Comments under a thread
 	r.GET("/threads/:id/comments", func(c *gin.Context) {
 		id := c.Param("id")
 		rows, err := database.DB.Query("SELECT id, content, user_id FROM comments WHERE thread_id = ?", id)
@@ -190,6 +190,25 @@ func main() {
 			comments = append(comments, gin.H{"id": id, "content": content, "userId": user_id})
 		}
 		c.JSON(http.StatusOK, comments)
+	})
+
+	//Get all categories from a thread
+	r.GET("threads/:id/categories", func(c *gin.Context) {
+		threadID := c.Param("id")
+		rows, err := database.DB.Query("SELECT c.name FROM categories c JOIN thread_categories tc ON c.id = tc.category_id WHERE tc.thread_id = ?;", threadID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to fetch categories"})
+			return
+		}
+
+		var categories []string
+		for rows.Next() {
+			var category_name string
+			rows.Scan(&category_name)
+			categories = append(categories, category_name)
+		}
+		c.JSON(http.StatusOK, categories)
+
 	})
 
 	//Post Comment

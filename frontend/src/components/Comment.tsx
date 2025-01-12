@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import EditMenu from "./EditMenu";
-import { TextField, Button, Typography } from "@mui/material";
+import { TextField, Button, Typography, Box } from "@mui/material";
 
 interface CommentProps {
   id: number;
@@ -48,7 +48,10 @@ const Comment = ({
   };
 
   return (
-    <div className="comment">
+    <Box
+      display="flex"
+      alignItems="center" // Vertically aligns items
+    >
       {editMode ? (
         <>
           <TextField
@@ -66,7 +69,7 @@ const Comment = ({
           )}
         </>
       )}
-    </div>
+    </Box>
   );
 };
 

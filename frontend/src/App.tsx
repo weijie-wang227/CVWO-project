@@ -4,7 +4,7 @@ import Post from "./components/Post"; // Post component
 import AddPost from "./components/AddPost";
 import Login from "./components/Login"; // Login component
 import Sidebar from "./components/SideBar"; //Sidebar component
-import { Divider, Typography, Button } from "@mui/material";
+import { Divider, Box, Toolbar } from "@mui/material";
 
 interface Thread {
   id: number;
@@ -47,43 +47,25 @@ const App: React.FC = () => {
     }
   }, [selectedCategories, threads]);
 
-  // Handle user login
-  const handleLogin = (id: number) => {
-    setUserId(id); // Set user ID
-    localStorage.setItem("userId", id.toString()); // Save session in localStorage
-    fetchThreads(); // Fetch threads after login
-  };
-
-  // Handle logout
-  const handleLogout = () => {
-    setUserId(0); // Clear user ID
-    localStorage.removeItem("userId"); // Remove from storage
-  };
-
   useEffect(() => {
     fetchThreads();
   }, [userId]); // Fetch threads whenever userId changes
 
   return (
-    <div>
-      <div>
-        {userId ? (
-          <div>
-            <Typography variant="h3">Welcome, User {userId}</Typography>
-            <Button onClick={handleLogout}>Logout</Button>
-          </div>
-        ) : (
-          <Login onLogin={handleLogin} />
-        )}
-      </div>
+    <Box sx={{ display: "flex" }}>
+      <Login setUserId={setUserId} userId={userId} />
+
       <Sidebar onCategorySelect={setSelectedCategories} />
-      <div key={"AddPost"}>
+      <Box
+        component="main"
+        sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
+      >
+        <Toolbar />
         {userId > 0 && <AddPost userId={userId} onPostAdded={fetchThreads} />}
         {threads &&
           filteredThreads.map((thread) => (
-            <>
+            <React.Fragment key={thread.id}>
               <Post
-                key={"post" + thread.id}
                 id={thread.id}
                 oldTitle={thread.title}
                 oldContent={thread.content}
@@ -92,10 +74,10 @@ const App: React.FC = () => {
                 onDelete={fetchThreads}
               />
               <Divider />
-            </>
+            </React.Fragment>
           ))}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
