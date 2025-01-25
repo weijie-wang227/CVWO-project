@@ -51,6 +51,7 @@ const Comment = ({
     <Box
       display="flex"
       alignItems="center" // Vertically aligns items
+      sx={{ height: "30px" }}
     >
       {editMode ? (
         <>

@@ -32,10 +32,11 @@ type Comment struct {
 
 func main() {
 	database.ConnectDatabase()
+	database.InitializeDatabase()
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowOrigins:     []string{"http://localhost:5174"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -237,6 +238,7 @@ func main() {
 		}
 	})
 
+	//Fetch comments under a thread
 	r.PUT("comments/:id", func(c *gin.Context) {
 		commentID := c.Param("id")
 		var comment Comment

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Post from "./components/Post"; // Post component
+import Post from "./components/Post";
 import AddPost from "./components/AddPost";
-import Login from "./components/Login"; // Login component
+import Login from "./components/Login";
 import Sidebar from "./components/SideBar"; //Sidebar component
-import { Divider, Box, Toolbar } from "@mui/material";
+import { Divider, Box, Toolbar } from "@mui/material"; //MUI
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 interface Thread {
   id: number;
@@ -14,7 +15,7 @@ interface Thread {
   categories: number[];
 }
 
-const App: React.FC = () => {
+const App = () => {
   const [userId, setUserId] = useState<number>(
     () => Number(localStorage.getItem("userId")) || 0
   );
@@ -52,35 +53,60 @@ const App: React.FC = () => {
   }, [userId]); // Fetch threads whenever userId changes
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <Login setUserId={setUserId} userId={userId} />
+    <Router>
+      <Box sx={{ display: "flex" }}>
+        <Login setUserId={setUserId} userId={userId} />
+        <Sidebar onCategorySelect={setSelectedCategories} />
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            bgcolor: "background.default",
+            p: 3,
+          }}
+          maxWidth="calc(100vw - 320px)"
+        >
+          <Toolbar />
 
-      <Sidebar
-        text={"Filter by Categories"}
-        onCategorySelect={setSelectedCategories}
-      />
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
-      >
-        <Toolbar />
-        {userId > 0 && <AddPost userId={userId} onPostAdded={fetchThreads} />}
-        {threads &&
-          filteredThreads.map((thread) => (
-            <React.Fragment key={thread.id}>
-              <Post
-                id={thread.id}
-                oldTitle={thread.title}
-                oldContent={thread.content}
-                userId={thread.userId}
-                currentUser={userId}
-                onDelete={fetchThreads}
-              />
-              <Divider />
-            </React.Fragment>
-          ))}
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <>
+                  {threads &&
+                    filteredThreads.map((thread) => (
+                      <React.Fragment key={thread.id}>
+                        <Post
+                          id={thread.id}
+                          oldTitle={thread.title}
+                          oldContent={thread.content}
+                          userId={thread.userId}
+                          currentUser={userId}
+                          onDelete={fetchThreads}
+                        />
+                        <Divider />
+                      </React.Fragment>
+                    ))}
+                </>
+              }
+            />
+            <Route
+              path="/addpost"
+              element={
+                <AddPost
+                  userId={userId}
+                  onPostAdded={() => {
+                    fetchThreads();
+                    window.location.href = "/";
+                  }}
+                  selectedCategories={selectedCategories}
+                />
+              }
+            />
+          </Routes>
+        </Box>
       </Box>
-    </Box>
+    </Router>
   );
 };
 

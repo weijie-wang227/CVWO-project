@@ -1,15 +1,19 @@
 import axios from "axios";
 import { useState, Dispatch, SetStateAction } from "react";
 import { Button, Typography, AppBar, Toolbar, TextField } from "@mui/material";
+import { useLocation } from "react-router-dom";
 
-const Login = ({
-  setUserId,
-  userId,
-}: {
+interface LoginProps {
   setUserId: Dispatch<SetStateAction<number>>;
   userId: number;
-}) => {
-  const [username, setUsername] = useState("");
+}
+
+const Login = ({ setUserId, userId }: LoginProps) => {
+  const [username, setUsername] = useState<string>(
+    () => localStorage.getItem("username") || "" // Initialize with localStorage
+  );
+
+  const location = useLocation();
 
   const handleLogin = async () => {
     try {
@@ -18,6 +22,7 @@ const Login = ({
       });
       setUserId(response.data.userId);
       localStorage.setItem("userId", response.data.userId.toString()); // Save session in localStorage
+      localStorage.setItem("username", username);
     } catch (error) {
       console.error("Login failed:", error);
     }
@@ -26,7 +31,17 @@ const Login = ({
   // Handle logout
   const handleLogout = () => {
     setUserId(0); // Clear user ID
-    localStorage.removeItem("userId"); // Remove from storage
+    setUsername(""); // Clear username state
+    localStorage.removeItem("userId"); // Remove userId from storage
+    localStorage.removeItem("username"); // Remove username from storag
+  };
+
+  const handleClick = () => {
+    if (location.pathname == "/") {
+      window.location.href = "/addpost";
+    } else {
+      window.location.href = "/";
+    }
   };
 
   return (
@@ -38,6 +53,9 @@ const Login = ({
               Welcome, {username}
             </Typography>
             <Button onClick={handleLogout}>Logout</Button>
+            <Button variant="contained" onClick={handleClick}>
+              {location.pathname == "/addpost" ? "Return" : "+ Add Post"}
+            </Button>
           </>
         ) : (
           <>

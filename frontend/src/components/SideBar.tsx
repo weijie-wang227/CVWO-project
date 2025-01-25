@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Drawer,
@@ -9,6 +9,7 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
+import { useLocation } from "react-router-dom";
 
 interface Category {
   id: number;
@@ -16,14 +17,14 @@ interface Category {
 }
 
 interface SidebarProps {
-  text: string;
   onCategorySelect: (selectedCategories: number[]) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ text, onCategorySelect }) => {
+const Sidebar = ({ onCategorySelect }: SidebarProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
 
+  const location = useLocation();
   useEffect(() => {
     // Fetch categories from the backend
     const fetchCategories = async () => {
@@ -62,13 +63,18 @@ const Sidebar: React.FC<SidebarProps> = ({ text, onCategorySelect }) => {
       >
         <Box sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}>
           <Toolbar />
-          <Typography variant="h6">{text}</Typography>
+          <Typography variant="h6">
+            {location.pathname == "/"
+              ? "Filter by Categories"
+              : "Select Categories"}
+          </Typography>
           <FormGroup>
             {categories.map((category) => (
               <FormControlLabel
                 onChange={() => handleCategoryToggle(category.id)}
                 control={<Checkbox />}
                 label={category.name}
+                key={category.id}
               />
             ))}
           </FormGroup>

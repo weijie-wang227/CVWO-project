@@ -144,8 +144,27 @@ const Post = ({
         </>
       ) : (
         <Box>
-          <Box display="flex" sx={{ height: "40px", p: "2px" }}>
-            <Typography variant="h5">{newTitle}</Typography>
+          <Box
+            display="flex"
+            sx={{
+              height: "40px",
+              p: "2px",
+              width: "100%",
+              overflow: "hidden",
+              display: "flex",
+              maxWidth: "100%",
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {newTitle}
+            </Typography>
             <Stack direction="row" spacing={0.5} sx={{ pl: "20px" }}>
               {categories &&
                 categories.map((category) => (
