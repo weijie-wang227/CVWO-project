@@ -4,15 +4,28 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 )
 
 var DB *sql.DB
 
 func ConnectDatabase() {
+	// Load environment variables from the .env file
+	err2 := godotenv.Load()
+	if err2 != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	// Replace with your database details
-	dsn := "cvwo_user:password123@tcp(127.0.0.1:3306)/forum"
+	dbHost := os.Getenv("DB_HOST")
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+	fmt.Println(dbUser)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s", dbUser, dbPassword, dbHost, dbName)
 
 	var err error
 	DB, err = sql.Open("mysql", dsn)
