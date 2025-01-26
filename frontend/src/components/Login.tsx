@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState, Dispatch, SetStateAction } from "react";
 import { Button, Typography, AppBar, Toolbar, TextField } from "@mui/material";
 import { useLocation } from "react-router-dom";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 interface LoginProps {
   setUserId: Dispatch<SetStateAction<number>>;
@@ -17,7 +18,7 @@ const Login = ({ setUserId, userId }: LoginProps) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:8080/login", {
+      const response = await axios.post(apiUrl + "/login", {
         username,
       });
       setUserId(response.data.userId);

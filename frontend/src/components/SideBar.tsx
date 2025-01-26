@@ -10,6 +10,7 @@ import {
   Checkbox,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 interface Category {
   id: number;
@@ -28,7 +29,7 @@ const Sidebar = ({ onCategorySelect }: SidebarProps) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/categories");
+        const response = await axios.get(apiUrl + "/categories");
         setCategories(response.data);
       } catch (error) {
         console.error("Failed to fetch categories:", error);

@@ -6,6 +6,7 @@ import Login from "./components/Login";
 import Sidebar from "./components/SideBar"; //Sidebar component
 import { Divider, Box, Toolbar } from "@mui/material"; //MUI
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 interface Thread {
   id: number;
@@ -26,7 +27,7 @@ const App = () => {
   // Fetch threads from backend
   const fetchThreads = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/threads");
+      const response = await axios.get(apiUrl + "/threads");
       setThreads(Array.isArray(response.data) ? response.data : []);
       setFilteredThreads(threads); // Initially show all threads
     } catch (error) {

@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { TextField, Button, Box, Typography } from "@mui/material/";
 import { useNavigate } from "react-router-dom";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 interface AddPostProps {
   userId: number;
@@ -45,7 +46,7 @@ const AddPost = ({ userId, onPostAdded, selectedCategories }: AddPostProps) => {
     }
 
     try {
-      await axios.post("http://localhost:8080/threads", {
+      await axios.post(apiUrl + "/threads", {
         title,
         content,
         userId,

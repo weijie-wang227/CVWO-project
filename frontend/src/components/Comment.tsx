@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import EditMenu from "./EditMenu";
 import { TextField, Button, Typography, Box } from "@mui/material";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 interface CommentProps {
   id: number;
@@ -26,7 +27,7 @@ const Comment = ({
   // Handle updating a comment
   const handleUpdate = async () => {
     try {
-      await axios.put(`http://localhost:8080/comments/${id}`, {
+      await axios.put(apiUrl + `/comments/${id}`, {
         content: newContent,
         userId: currentUser,
       });
@@ -40,7 +41,7 @@ const Comment = ({
   // Handle deleting a comment
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8080/comments/${id}`);
+      await axios.delete(apiUrl + `/comments/${id}`);
       onDelete(id); // Remove from parent component
     } catch (error) {
       console.error("Failed to delete comment:", error);

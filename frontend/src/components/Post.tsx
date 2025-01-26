@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Comment from "./Comment";
 import EditMenu from "./EditMenu.tsx";
 import { Box, Button, TextField, Typography, Stack, Chip } from "@mui/material";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 interface CommentData {
   id: number;
@@ -50,9 +51,7 @@ const Post = ({
   // Fetch comments
   const fetchComments = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8080/threads/${id}/comments`
-      );
+      const response = await axios.get(apiUrl + `/threads/${id}/comments`);
       setComments(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Failed to fetch comments:", error);
@@ -61,9 +60,7 @@ const Post = ({
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8080/threads/${id}/categories`
-      );
+      const response = await axios.get(apiUrl + `/threads/${id}/categories`);
       setCategories(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Failed to fetch categories:", error);
