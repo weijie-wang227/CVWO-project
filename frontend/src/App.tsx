@@ -50,7 +50,7 @@ const App = () => {
 
   useEffect(() => {
     fetchThreads();
-  }, [userId]); // Fetch threads whenever userId changes
+  }, []);
 
   return (
     <Router>
@@ -62,7 +62,7 @@ const App = () => {
           sx={{
             flexGrow: 1,
             bgcolor: "background.default",
-            p: 3,
+            p: 1,
           }}
           maxWidth="calc(100vw - 320px)"
         >
@@ -72,7 +72,7 @@ const App = () => {
             <Route
               path="/"
               element={
-                <>
+                <Box>
                   {threads &&
                     filteredThreads.map((thread) => (
                       <React.Fragment key={thread.id}>
@@ -87,7 +87,7 @@ const App = () => {
                         <Divider />
                       </React.Fragment>
                     ))}
-                </>
+                </Box>
               }
             />
             <Route

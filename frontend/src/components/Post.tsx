@@ -129,16 +129,24 @@ const Post = ({
   };
 
   return (
-    <Box>
+    <Box sx={{ m: 2, backgroundColor: "#ffffff" }}>
       {editMode ? (
         <>
           <TextField
             value={newTitle}
             onChange={(e) => setTitle(e.target.value)}
+            variant="outlined"
+            placeholder="Title"
+            fullWidth
           />
           <TextField
             value={newContent}
             onChange={(e) => setContent(e.target.value)}
+            placeholder="Content"
+            multiline
+            rows={5}
+            style={{ flex: 1 }}
+            fullWidth
           />
           <Button onClick={handleUpdate}>Save</Button>
         </>
@@ -161,6 +169,7 @@ const Post = ({
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
+                fontWeight: "bold",
               }}
             >
               {newTitle}
@@ -189,19 +198,10 @@ const Post = ({
 
       {expanded && (
         <div className="comments-section">
-          <h3>Comments</h3>
-          {currentUser != 0 && (
-            <>
-              <TextField
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Write a comment..."
-              />
-              <Button onClick={handleAddComment} variant="outlined">
-                Add Comment
-              </Button>
-            </>
-          )}
+          <Typography>
+            <b>Comments</b>
+          </Typography>
+
           {comments &&
             comments.map((comment) => (
               <Comment
@@ -214,6 +214,19 @@ const Post = ({
                 onUpdate={handleUpdateComment}
               />
             ))}
+          {currentUser != 0 && (
+            <>
+              <TextField
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Write a comment..."
+                fullWidth
+              />
+              <Button onClick={handleAddComment} variant="outlined">
+                Add Comment
+              </Button>
+            </>
+          )}
         </div>
       )}
     </Box>

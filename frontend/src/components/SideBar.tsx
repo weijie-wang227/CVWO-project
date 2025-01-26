@@ -26,7 +26,6 @@ const Sidebar = ({ onCategorySelect }: SidebarProps) => {
 
   const location = useLocation();
   useEffect(() => {
-    // Fetch categories from the backend
     const fetchCategories = async () => {
       try {
         const response = await axios.get("http://localhost:8080/categories");

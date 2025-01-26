@@ -28,7 +28,6 @@ const Login = ({ setUserId, userId }: LoginProps) => {
     }
   };
 
-  // Handle logout
   const handleLogout = () => {
     setUserId(0); // Clear user ID
     setUsername(""); // Clear username state

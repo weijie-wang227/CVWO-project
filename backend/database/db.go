@@ -72,7 +72,7 @@ func InitializeDatabase() {
 
 	// Insert default categories
 	defaultCategories := `
-	INSERT IGNORE INTO categories (name) VALUES ('General'), ('Announcements'), ('FeeDBack');`
+	INSERT IGNORE INTO categories (name) VALUES ('General'), ('Announcements'), ('FeedBack');`
 	if _, err := DB.Exec(defaultCategories); err != nil {
 		log.Fatalf("Failed to insert default categories: %v", err)
 	}
